@@ -1,707 +1,9 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block extra_styles %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<style>
-.booking-page {
-    min-height: calc(100vh - 68px);
-    background:
-        radial-gradient(ellipse at 80% 10%, rgba(76,186,128,0.12) 0%, transparent 50%),
-        radial-gradient(ellipse at 10% 90%, rgba(45,158,95,0.08)  0%, transparent 50%),
-        var(--green-bg);
-    padding: 56px 24px 100px;
-}
-
-.booking-inner {
-    max-width: 1160px;
-    margin: 0 auto;
-}
-
-.page-header {
-    margin-bottom: 48px;
-    animation: fadeUp 0.5s ease both;
-}
-
-.page-header .breadcrumb {
-    font-size: 13px;
-    color: var(--text-muted);
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.page-header .breadcrumb a {
-    color: var(--green-mid);
-    text-decoration: none;
-}
-
-.page-header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 4vw, 48px);
-    color: var(--text-dark);
-    margin-bottom: 10px;
-}
-
-.page-header p {
-    font-size: 16px;
-    color: var(--text-muted);
-    font-weight: 300;
-}
-
-.steps-bar {
-    display: flex;
-    align-items: center;
-    margin-bottom: 48px;
-    animation: fadeUp 0.5s ease 0.1s both;
-}
-
-.step-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex: 1;
-    position: relative;
-}
-
-.step-item:not(:last-child)::after {
-    content: '';
-    position: absolute;
-    left: 46px;
-    top: 20px;
-    width: calc(100% - 46px);
-    height: 2px;
-    background: var(--border);
-    z-index: 0;
-    transition: background 0.4s;
-}
-
-.step-item.done:not(:last-child)::after  { background: var(--green-mid); }
-.step-item.active:not(:last-child)::after { background: var(--border); }
-
-.step-dot {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 2px solid var(--border);
-    background: var(--white);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px; font-weight: 700;
-    color: var(--text-muted);
-    position: relative; z-index: 1;
-    transition: all 0.3s;
-    flex-shrink: 0;
-}
-
-.step-item.active .step-dot {
-    border-color: var(--green-mid);
-    background: var(--green-mid);
-    color: white;
-    box-shadow: 0 0 0 4px rgba(45,158,95,0.18);
-}
-
-.step-item.done .step-dot {
-    border-color: var(--green-mid);
-    background: var(--green-pale);
-    color: var(--green-deep);
-}
-
-.step-label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    white-space: nowrap;
-    transition: color 0.3s;
-}
-
-.step-item.active .step-label { color: var(--green-deep); }
-.step-item.done  .step-label  { color: var(--green-mid); }
-
-.booking-layout {
-    display: grid;
-    grid-template-columns: 1fr 340px;
-    gap: 28px;
-    align-items: start;
-}
-
-.bcard {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 36px;
-    box-shadow: var(--shadow-sm);
-    animation: fadeUp 0.5s ease 0.15s both;
-}
-
-.bcard-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    color: var(--text-dark);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.form-grid .full { grid-column: 1 / -1; }
-
-.field { display: flex; flex-direction: column; gap: 7px; }
-
-.field label {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-dark);
-}
-
-.field input,
-.field select,
-.field textarea {
-    padding: 12px 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    background: var(--green-bg);
-    font-size: 15px;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text-dark);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    appearance: none;
-}
-
-.field input:focus,
-.field select:focus,
-.field textarea:focus {
-    border-color: var(--green-mid);
-    background: var(--white);
-    box-shadow: 0 0 0 3px rgba(45,158,95,0.12);
-}
-
-.field textarea { resize: vertical; min-height: 90px; }
-.field input::placeholder, .field textarea::placeholder { color: #a8bfb0; }
-
-.select-wrap { position: relative; }
-.select-wrap::after {
-    content: '▾';
-    position: absolute;
-    right: 14px; top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-    color: var(--text-muted);
-    font-size: 13px;
-}
-
-.waste-picker {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-top: 4px;
-}
-
-.waste-option {
-    position: relative;
-}
-
-.waste-option input[type="checkbox"] {
-    position: absolute; opacity: 0; width: 0; height: 0;
-}
-
-.waste-option label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 18px 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    background: var(--green-bg);
-    cursor: pointer;
-    transition: all 0.22s;
-    text-align: center;
-}
-
-.waste-option label .w-icon { font-size: 28px; }
-.waste-option label .w-name {
-    font-size: 12px; font-weight: 600;
-    color: var(--text-dark); line-height: 1.3;
-}
-
-.waste-option input:checked + label {
-    border-color: var(--green-mid);
-    background: var(--green-pale);
-    box-shadow: 0 0 0 3px rgba(45,158,95,0.14);
-}
-
-.waste-option label:hover {
-    border-color: var(--green-light);
-    transform: translateY(-2px);
-}
-
-.map-section { margin-top: 28px; }
-
-.map-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
-}
-
-.map-header h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px; color: var(--text-dark);
-}
-
-.map-legend {
-    display: flex;
-    gap: 14px;
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-.legend-dot {
-    display: inline-block;
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    margin-right: 5px;
-}
-
-#ecomap {
-    width: 100%;
-    height: 420px;
-    border-radius: 16px;
-    border: 1.5px solid var(--border);
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    z-index: 1;
-}
-
-.selected-factory {
-    margin-top: 16px;
-    padding: 14px 18px;
-    background: var(--green-pale);
-    border: 1.5px solid var(--green-light);
-    border-radius: 12px;
-    display: none;
-    align-items: center;
-    gap: 12px;
-    font-size: 14px;
-    color: var(--green-deep);
-    font-weight: 500;
-}
-
-.selected-factory.visible { display: flex; }
-
-.slot-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-top: 4px;
-}
-
-.slot-btn {
-    padding: 11px 8px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    background: var(--green-bg);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-}
-
-.slot-btn:hover {
-    border-color: var(--green-light);
-    color: var(--green-deep);
-    background: var(--white);
-}
-
-.slot-btn.selected {
-    border-color: var(--green-mid);
-    background: var(--green-pale);
-    color: var(--green-deep);
-    box-shadow: 0 0 0 3px rgba(45,158,95,0.12);
-}
-
-.slot-btn.unavailable {
-    opacity: 0.38;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-/* ═══════════════════════════════════════
-   PAYMENT SECTION
-════════════════════════════════════════ */
-.payment-section { margin-top: 28px; }
-
-.payment-methods {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 28px;
-}
-
-.pay-method {
-    position: relative;
-}
-
-.pay-method input[type="radio"] {
-    position: absolute; opacity: 0; width: 0; height: 0;
-}
-
-.pay-method label {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 18px 10px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 14px;
-    background: var(--green-bg);
-    cursor: pointer;
-    transition: all 0.22s;
-    text-align: center;
-}
-
-.pay-method label .pm-icon  { font-size: 26px; }
-.pay-method label .pm-label {
-    font-size: 12px; font-weight: 600; color: var(--text-dark);
-}
-
-.pay-method input:checked + label {
-    border-color: var(--green-mid);
-    background: var(--green-pale);
-    box-shadow: 0 0 0 3px rgba(45,158,95,0.14);
-}
-
-.pay-method label:hover {
-    border-color: var(--green-light);
-    transform: translateY(-2px);
-}
-
-/* Payment panels */
-.pay-panel { display: none; }
-.pay-panel.active { display: block; }
-
-/* Card inputs */
-.card-fields { display: flex; flex-direction: column; gap: 16px; }
-.card-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
-.card-input-wrap {
-    position: relative;
-}
-
-.card-input-wrap input {
-    width: 100%;
-    padding: 13px 18px 13px 46px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    background: var(--green-bg);
-    font-size: 15px;
-    font-family: 'DM Sans', sans-serif;
-    color: var(--text-dark);
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-    letter-spacing: 1px;
-}
-
-.card-input-wrap input:focus {
-    border-color: var(--green-mid);
-    background: var(--white);
-    box-shadow: 0 0 0 3px rgba(45,158,95,0.12);
-}
-
-.card-input-wrap .ci-icon {
-    position: absolute;
-    left: 14px; top: 50%;
-    transform: translateY(-50%);
-    font-size: 17px; pointer-events: none;
-}
-
-/* UPI panel */
-.upi-wrap {
-    display: flex;
-    gap: 12px;
-    align-items: flex-end;
-}
-
-.upi-wrap .field { flex: 1; }
-
-.btn-verify {
-    padding: 12px 20px;
-    background: var(--green-pale);
-    border: 1.5px solid var(--green-mid);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px; font-weight: 600;
-    color: var(--green-deep);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s;
-    height: fit-content;
-}
-
-.btn-verify:hover { background: var(--green-mid); color: white; }
-
-/* COD info */
-.cod-info {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    background: var(--green-bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 18px;
-}
-
-.cod-info .cod-icon { font-size: 32px; flex-shrink: 0; }
-.cod-info p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
-.cod-info strong { color: var(--text-dark); }
-
-/* ═══════════════════════════════════════
-   ORDER SUMMARY SIDEBAR
-════════════════════════════════════════ */
-.summary-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 32px 28px;
-    box-shadow: var(--shadow-sm);
-    position: sticky;
-    top: 90px;
-    animation: fadeUp 0.5s ease 0.2s both;
-}
-
-.summary-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 19px; color: var(--text-dark);
-    margin-bottom: 24px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid var(--border);
-}
-
-.summary-rows { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-}
-
-.summary-row .sr-label { color: var(--text-muted); }
-.summary-row .sr-value { font-weight: 600; color: var(--text-dark); }
-.summary-row .sr-value.green { color: var(--green-mid); }
-
-.summary-divider {
-    height: 1px; background: var(--border); margin: 4px 0 16px;
-}
-
-.summary-total {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 28px;
-}
-
-.summary-total .t-label {
-    font-size: 15px; font-weight: 700; color: var(--text-dark);
-}
-
-.summary-total .t-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px; font-weight: 700;
-    color: var(--green-deep);
-}
-
-.btn-confirm {
-    width: 100%;
-    padding: 16px;
-    background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
-    color: var(--white);
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 5px 18px rgba(45,158,95,0.40);
-    transition: all 0.25s;
-    letter-spacing: 0.2px;
-}
-
-.btn-confirm:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(45,158,95,0.50);
-}
-
-.btn-confirm:active { transform: translateY(0); }
-
-.secure-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 14px;
-    font-size: 12px;
-    color: var(--text-muted);
-}
-
-/* ── Section dividers inside main card ───── */
-.section-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 32px 0;
-}
-
-.subsection-title {
-    font-size: 15px;
-    font-weight: 700;
-    color: var(--text-dark);
-    margin-bottom: 16px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* ── Success Modal ────────────────────────── */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 40, 20, 0.55);
-    backdrop-filter: blur(6px);
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
-}
-
-.modal-overlay.open {
-    opacity: 1;
-    pointer-events: all;
-}
-
-.modal-box {
-    background: var(--white);
-    border-radius: 24px;
-    padding: 56px 48px;
-    max-width: 480px;
-    width: 90%;
-    text-align: center;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.25);
-    transform: scale(0.9) translateY(20px);
-    transition: transform 0.35s cubic-bezier(0.22,1,0.36,1);
-}
-
-.modal-overlay.open .modal-box {
-    transform: scale(1) translateY(0);
-}
-
-.modal-check {
-    width: 72px; height: 72px;
-    background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 34px;
-    margin: 0 auto 24px;
-    box-shadow: 0 6px 20px rgba(45,158,95,0.40);
-}
-
-.modal-box h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px; color: var(--text-dark);
-    margin-bottom: 12px;
-}
-
-.modal-box p {
-    font-size: 15px; color: var(--text-muted);
-    line-height: 1.6; margin-bottom: 32px;
-}
-
-.modal-id {
-    display: inline-block;
-    background: var(--green-pale);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 10px 24px;
-    font-family: monospace;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--green-deep);
-    margin-bottom: 32px;
-    letter-spacing: 2px;
-}
-
-.btn-modal-done {
-    display: inline-block;
-    padding: 14px 40px;
-    background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
-    color: white; border: none; border-radius: 50px;
-    font-size: 16px; font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    box-shadow: 0 5px 18px rgba(45,158,95,0.40);
-    transition: all 0.2s;
-    text-decoration: none;
-}
-
-.btn-modal-done:hover { transform: translateY(-2px); }
-
-/* ── Animations ───────────────────────────── */
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to   { opacity: 1; transform: translateY(0); }
-}
-
-/* ── Leaflet popup custom styling ─────────── */
-.leaflet-popup-content-wrapper {
-    border-radius: 12px !important;
-    box-shadow: var(--shadow-md) !important;
-    font-family: 'DM Sans', sans-serif !important;
-}
-
-.leaflet-popup-content {
-    margin: 14px 18px !important;
-    min-width: 200px;
-}
-
-.popup-title {
-    font-weight: 700; font-size: 14px;
-    color: var(--text-dark); margin-bottom: 4px;
-}
-
-.popup-type {
-    font-size: 12px; color: var(--text-muted); margin-bottom: 8px;
-}
-
-.popup-distance {
-    font-size: 12px; color: var(--green-mid); font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.popup-select-btn {
-    width: 100%;
-    padding: 8px;
-    background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
-    color: white; border: none; border-radius: 8px;
-    font-size: 13px; font-weight: 600;
-    font-family: 'DM Sans', sans-serif;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-
-.popup-select-btn:hover { opacity: 0.88; }
-</style>
+<link rel="stylesheet" href="{% static 'css/booking.css' %}" />
 {% endblock %}
 
 
@@ -710,7 +12,7 @@
 <div class="booking-page">
 <div class="booking-inner">
 
-    <!-- ── Page Header ───────────────────────── -->
+    <!-- Page header -->
     <div class="page-header">
         <div class="breadcrumb">
             <a href="/">Home</a> › <span>Book a Pickup</span>
@@ -719,7 +21,7 @@
         <p>Fill in your details, pick a nearby disposal factory, and confirm payment.</p>
     </div>
 
-    <!-- ── Step Bar ──────────────────────────── -->
+    <!-- Progress steps -->
     <div class="steps-bar">
         <div class="step-item active" id="step-item-1">
             <div class="step-dot">1</div>
@@ -739,18 +41,16 @@
         </div>
     </div>
 
-    <!-- ── Main Layout ───────────────────────── -->
+    <!-- Main form -->
     <form method="POST" id="booking-form">
         {% csrf_token %}
 
         <div class="booking-layout">
 
-            <!-- ════════════════════════════════
-                 LEFT — Main Form
-            ════════════════════════════════ -->
+            <!-- Left: form sections -->
             <div class="bcard">
 
-                <!-- ▸ SECTION 1 — Personal Details -->
+                <!-- Personal details -->
                 <div class="bcard-title">👤 Personal Details</div>
 
                 <div class="form-grid">
@@ -783,9 +83,9 @@
 
                 <div class="section-divider"></div>
 
-                <!-- ▸ SECTION 2 — Waste Type -->
+                <!-- Waste type -->
                 <div class="bcard-title">🗑️ Waste Type</div>
-                <p style="font-size:14px;color:var(--text-muted);margin-bottom:18px;">
+                <p style="font-size:14px; color:var(--text-muted); margin-bottom:18px;">
                     Select all types that apply. Pricing updates automatically.
                 </p>
 
@@ -850,11 +150,10 @@
 
                 <div class="section-divider"></div>
 
-                <!-- ▸ SECTION 3 — Map -->
+                <!-- Factory map -->
                 <div class="bcard-title">📍 Nearby Disposal Factories</div>
-                <p style="font-size:14px;color:var(--text-muted);margin-bottom:16px;">
-                    Click a pin to see factory details. Select the one you'd like your waste
-                    sent to.
+                <p style="font-size:14px; color:var(--text-muted); margin-bottom:16px;">
+                    Click a pin to see factory details. Select the one you'd like your waste sent to.
                 </p>
 
                 <div class="map-section">
@@ -862,20 +161,16 @@
                         <h3>Factory Map</h3>
                         <div class="map-legend">
                             <span>
-                                <span class="legend-dot" style="background:#2d9e5f;"></span>
-                                Recycling
+                                <span class="legend-dot" style="background:#2d9e5f;"></span>Recycling
                             </span>
                             <span>
-                                <span class="legend-dot" style="background:#e67e22;"></span>
-                                Hazardous
+                                <span class="legend-dot" style="background:#e67e22;"></span>Hazardous
                             </span>
                             <span>
-                                <span class="legend-dot" style="background:#3498db;"></span>
-                                Composting
+                                <span class="legend-dot" style="background:#3498db;"></span>Composting
                             </span>
                             <span>
-                                <span class="legend-dot" style="background:#9b59b6;"></span>
-                                General
+                                <span class="legend-dot" style="background:#9b59b6;"></span>General
                             </span>
                         </div>
                     </div>
@@ -890,7 +185,7 @@
 
                 <div class="section-divider"></div>
 
-                <!-- ▸ SECTION 4 — Schedule -->
+                <!-- Schedule -->
                 <div class="bcard-title">🗓️ Schedule Pickup</div>
 
                 <div class="form-grid" style="margin-bottom:20px;">
@@ -901,12 +196,12 @@
                     <div class="field">
                         <label>Preferred Time Slot</label>
                         <div class="slot-grid">
-                            <button type="button" class="slot-btn"         data-slot="08:00-10:00">8–10 AM</button>
-                            <button type="button" class="slot-btn"         data-slot="10:00-12:00">10–12 AM</button>
-                            <button type="button" class="slot-btn selected" data-slot="12:00-14:00">12–2 PM</button>
-                            <button type="button" class="slot-btn"         data-slot="14:00-16:00">2–4 PM</button>
-                            <button type="button" class="slot-btn unavailable" data-slot="16:00-18:00">4–6 PM</button>
-                            <button type="button" class="slot-btn"         data-slot="18:00-20:00">6–8 PM</button>
+                            <button type="button" class="slot-btn"              data-slot="08:00-10:00">8–10 AM</button>
+                            <button type="button" class="slot-btn"              data-slot="10:00-12:00">10–12 AM</button>
+                            <button type="button" class="slot-btn selected"     data-slot="12:00-14:00">12–2 PM</button>
+                            <button type="button" class="slot-btn"              data-slot="14:00-16:00">2–4 PM</button>
+                            <button type="button" class="slot-btn unavailable"  data-slot="16:00-18:00">4–6 PM</button>
+                            <button type="button" class="slot-btn"              data-slot="18:00-20:00">6–8 PM</button>
                         </div>
                         <input type="hidden" name="time_slot" id="time_slot_input" value="12:00-14:00">
                     </div>
@@ -915,43 +210,39 @@
                 <div class="field">
                     <label for="notes">Additional Notes (optional)</label>
                     <textarea id="notes" name="notes"
-                              placeholder="Gate code, special instructions, access notes..."></textarea>
+                              placeholder="Gate code, special instructions, access notes…"></textarea>
                 </div>
 
                 <div class="section-divider"></div>
 
-                <!-- ▸ SECTION 5 — Payment -->
+                <!-- Payment -->
                 <div class="bcard-title">💳 Payment Method</div>
 
                 <div class="payment-section">
                     <div class="payment-methods">
                         <div class="pay-method">
-                            <input type="radio" name="payment_method"
-                                   id="pm_card" value="card" checked>
+                            <input type="radio" name="payment_method" id="pm_card" value="card" checked>
                             <label for="pm_card">
                                 <span class="pm-icon">💳</span>
                                 <span class="pm-label">Card</span>
                             </label>
                         </div>
                         <div class="pay-method">
-                            <input type="radio" name="payment_method"
-                                   id="pm_upi" value="upi">
+                            <input type="radio" name="payment_method" id="pm_upi" value="upi">
                             <label for="pm_upi">
                                 <span class="pm-icon">📱</span>
                                 <span class="pm-label">UPI</span>
                             </label>
                         </div>
                         <div class="pay-method">
-                            <input type="radio" name="payment_method"
-                                   id="pm_nb" value="netbanking">
+                            <input type="radio" name="payment_method" id="pm_nb" value="netbanking">
                             <label for="pm_nb">
                                 <span class="pm-icon">🏦</span>
                                 <span class="pm-label">Net Banking</span>
                             </label>
                         </div>
                         <div class="pay-method">
-                            <input type="radio" name="payment_method"
-                                   id="pm_cod" value="cod">
+                            <input type="radio" name="payment_method" id="pm_cod" value="cod">
                             <label for="pm_cod">
                                 <span class="pm-icon">💵</span>
                                 <span class="pm-label">Cash on Day</span>
@@ -965,9 +256,8 @@
                         <div class="card-fields">
                             <div class="card-input-wrap">
                                 <span class="ci-icon">🔢</span>
-                                <input type="text" name="card_number"
-                                       placeholder="1234  5678  9012  3456"
-                                       maxlength="19" id="card-num-input">
+                                <input type="text" name="card_number" id="card-num-input"
+                                       placeholder="1234  5678  9012  3456" maxlength="19">
                             </div>
                             <div class="card-input-wrap">
                                 <span class="ci-icon">👤</span>
@@ -993,15 +283,14 @@
                     <div class="pay-panel" id="panel-upi">
                         <div class="subsection-title">📱 UPI Payment</div>
                         <div class="upi-wrap">
-                            <div class="field" style="flex:1;">
+                            <div class="field">
                                 <label for="upi_id">UPI ID</label>
                                 <input type="text" id="upi_id" name="upi_id"
                                        placeholder="yourname@upi">
                             </div>
-                            <button type="button" class="btn-verify"
-                                    onclick="verifyUPI()">Verify</button>
+                            <button type="button" class="btn-verify" onclick="verifyUPI()">Verify</button>
                         </div>
-                        <p id="upi-status" style="font-size:13px;margin-top:10px;color:var(--text-muted);"></p>
+                        <p id="upi-status" style="font-size:13px; margin-top:10px; color:var(--text-muted);"></p>
                     </div>
 
                     <!-- Net Banking panel -->
@@ -1023,7 +312,7 @@
                                 </select>
                             </div>
                         </div>
-                        <p style="font-size:13px;color:var(--text-muted);margin-top:10px;">
+                        <p style="font-size:13px; color:var(--text-muted); margin-top:10px;">
                             You will be redirected to your bank's secure portal to complete payment.
                         </p>
                     </div>
@@ -1040,14 +329,13 @@
                             </p>
                         </div>
                     </div>
-                </div>
+
+                </div><!-- end payment-section -->
 
             </div><!-- end bcard -->
 
 
-            <!-- ════════════════════════════════
-                 RIGHT — Order Summary Sidebar
-            ════════════════════════════════ -->
+            <!-- Right: order summary sidebar -->
             <div class="summary-card">
                 <h3>Order Summary</h3>
 
@@ -1118,9 +406,7 @@
 </div><!-- end booking-page -->
 
 
-<!-- ═══════════════════════════════════════
-     SUCCESS MODAL
-════════════════════════════════════════ -->
+<!-- Success modal -->
 <div class="modal-overlay" id="success-modal">
     <div class="modal-box">
         <div class="modal-check">✓</div>
@@ -1136,306 +422,10 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════ -->
+{% endblock %}
+
+
+{% block extra_scripts %}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-/* ────────────────────────────────────────
-   1. MAP — Leaflet (free, no API key)
-──────────────────────────────────────── */
-
-// Sample disposal factories in Kochi, Kerala
-const factories = [
-    {
-        id: 1,
-        name: "GreenCycle Kochi",
-        type: "Recycling",
-        color: "#2d9e5f",
-        lat: 9.9312,
-        lng: 76.2673,
-        address: "Edapally, Kochi",
-        accepts: "Recyclables, E-Waste",
-        open: "Mon–Sat 8AM–6PM",
-        distance: "2.4 km"
-    },
-    {
-        id: 2,
-        name: "SafeDispose Centre",
-        type: "Hazardous",
-        color: "#e67e22",
-        lat: 9.9195,
-        lng: 76.2598,
-        address: "Kaloor, Kochi",
-        accepts: "Hazardous, Medical Waste",
-        open: "Mon–Fri 9AM–5PM",
-        distance: "3.8 km"
-    },
-    {
-        id: 3,
-        name: "BioCompost Hub",
-        type: "Composting",
-        color: "#3498db",
-        lat: 9.9457,
-        lng: 76.2800,
-        address: "Kalamassery, Kochi",
-        accepts: "Organic, Garden Waste",
-        open: "Daily 7AM–7PM",
-        distance: "4.1 km"
-    },
-    {
-        id: 4,
-        name: "Kerala Waste Authority",
-        type: "General",
-        color: "#9b59b6",
-        lat: 9.9058,
-        lng: 76.2780,
-        address: "Thripunithura, Kochi",
-        accepts: "All types",
-        open: "Mon–Sat 8AM–5PM",
-        distance: "5.6 km"
-    },
-    {
-        id: 5,
-        name: "EcoPark Recyclers",
-        type: "Recycling",
-        color: "#2d9e5f",
-        lat: 10.0020,
-        lng: 76.3100,
-        address: "Aluva, Ernakulam",
-        accepts: "Recyclables, Bulk",
-        open: "Daily 6AM–8PM",
-        distance: "8.2 km"
-    },
-    {
-        id: 6,
-        name: "CleanTech Kochi",
-        type: "General",
-        color: "#9b59b6",
-        lat: 9.8850,
-        lng: 76.2470,
-        address: "Maradu, Kochi",
-        accepts: "General, Bulk",
-        open: "Mon–Sat 9AM–6PM",
-        distance: "6.7 km"
-    }
-];
-
-// Build custom circle markers
-function makeIcon(color) {
-    return L.divIcon({
-        className: '',
-        html: `<div style="
-            width:22px; height:22px;
-            background:${color};
-            border-radius:50%;
-            border:3px solid white;
-            box-shadow:0 2px 8px rgba(0,0,0,0.30);
-        "></div>`,
-        iconSize: [22, 22],
-        iconAnchor: [11, 11],
-        popupAnchor: [0, -14]
-    });
-}
-
-// Centre on Kochi
-const map = L.map('ecomap', {
-    center: [9.9312, 76.2673],
-    zoom: 12,
-    zoomControl: true
-});
-
-// OpenStreetMap tiles (free, no API key)
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
-    maxZoom: 19
-}).addTo(map);
-
-// User location marker
-const userIcon = L.divIcon({
-    className: '',
-    html: `<div style="
-        width:16px; height:16px;
-        background:#1a6b3c;
-        border-radius:50%;
-        border:3px solid white;
-        box-shadow:0 0 0 6px rgba(26,107,60,0.25);
-    "></div>`,
-    iconSize: [16, 16],
-    iconAnchor: [8, 8]
-});
-
-L.marker([9.9312, 76.2673], { icon: userIcon })
-  .addTo(map)
-  .bindPopup('<div class="popup-title">📍 Your Location</div>')
-  .openPopup();
-
-// Add factory markers
-factories.forEach(f => {
-    const marker = L.marker([f.lat, f.lng], { icon: makeIcon(f.color) }).addTo(map);
-    marker.bindPopup(`
-        <div class="popup-title">${f.name}</div>
-        <div class="popup-type">${f.type} Facility</div>
-        <div style="font-size:12px;color:#5a7a65;margin-bottom:4px;">📍 ${f.address}</div>
-        <div style="font-size:12px;color:#5a7a65;margin-bottom:4px;">✅ ${f.accepts}</div>
-        <div style="font-size:12px;color:#5a7a65;margin-bottom:6px;">🕐 ${f.open}</div>
-        <div class="popup-distance">🚗 ${f.distance} away</div>
-        <button class="popup-select-btn"
-            onclick="selectFactory(${f.id}, '${f.name}', '${f.distance}')">
-            Select This Factory
-        </button>
-    `);
-});
-
-function selectFactory(id, name, distance) {
-    document.getElementById('factory_id_input').value = id;
-    document.getElementById('selected-factory-name').textContent =
-        `${name} · ${distance} away`;
-    document.getElementById('selected-factory-display').classList.add('visible');
-    document.getElementById('sum-factory').textContent = name;
-    map.closePopup();
-}
-
-/* ────────────────────────────────────────
-   2. DATE — set minimum to today
-──────────────────────────────────────── */
-const dateInput = document.getElementById('pickup_date');
-const today = new Date().toISOString().split('T')[0];
-dateInput.setAttribute('min', today);
-dateInput.value = today;
-updateSummaryDate(today);
-
-dateInput.addEventListener('change', e => updateSummaryDate(e.target.value));
-
-function updateSummaryDate(val) {
-    if (!val) return;
-    const d = new Date(val);
-    const fmt = d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
-    document.getElementById('sum-date').textContent = fmt;
-}
-
-/* ────────────────────────────────────────
-   3. TIME SLOTS
-──────────────────────────────────────── */
-document.querySelectorAll('.slot-btn:not(.unavailable)').forEach(btn => {
-    btn.addEventListener('click', () => {
-        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        document.getElementById('time_slot_input').value = btn.dataset.slot;
-        document.getElementById('sum-slot').textContent = btn.textContent.trim();
-    });
-});
-
-/* ────────────────────────────────────────
-   4. PRICING — dynamic calc
-──────────────────────────────────────── */
-const prices = {
-    general: 0, recyclable: 30, organic: 20,
-    ewaste: 80, hazardous: 150, bulk: 100
-};
-
-const weightExtra = {
-    '0-10': 0, '10-50': 50, '50-200': 120, '200+': 250
-};
-
-function recalcPrice() {
-    let surcharge = 0;
-    let types = [];
-
-    document.querySelectorAll('.waste-option input:checked').forEach(cb => {
-        surcharge += prices[cb.value] || 0;
-        const label = cb.nextElementSibling.querySelector('.w-name').textContent;
-        types.push(label);
-    });
-
-    const wsel = document.getElementById('weight').value;
-    surcharge += weightExtra[wsel] || 0;
-
-    const base = 149;
-    const discount = 20;
-    const cod_fee = document.querySelector('input[name="payment_method"]:checked').value === 'cod' ? 20 : 0;
-    const total = base + surcharge - discount + cod_fee;
-
-    document.getElementById('sum-waste').textContent    = types.join(', ') || 'None';
-    document.getElementById('sum-weight').textContent   = wsel + ' kg';
-    document.getElementById('sum-base').textContent     = '₹ ' + base;
-    document.getElementById('sum-surcharge').textContent = '₹ ' + surcharge;
-    document.getElementById('sum-total').textContent    = '₹ ' + total;
-}
-
-document.querySelectorAll('.waste-option input').forEach(cb => cb.addEventListener('change', recalcPrice));
-document.getElementById('weight').addEventListener('change', recalcPrice);
-document.querySelectorAll('input[name="payment_method"]').forEach(r => r.addEventListener('change', recalcPrice));
-recalcPrice();
-
-/* ────────────────────────────────────────
-   5. WEIGHT → summary
-──────────────────────────────────────── */
-document.getElementById('weight').addEventListener('change', e => {
-    document.getElementById('sum-weight').textContent = e.target.value + ' kg';
-});
-
-/* ────────────────────────────────────────
-   6. PAYMENT METHOD SWITCH
-──────────────────────────────────────── */
-document.querySelectorAll('input[name="payment_method"]').forEach(r => {
-    r.addEventListener('change', function () {
-        document.querySelectorAll('.pay-panel').forEach(p => p.classList.remove('active'));
-        document.getElementById('panel-' + this.value).classList.add('active');
-        const labels = { card:'Card', upi:'UPI', netbanking:'Net Banking', cod:'Cash on Day' };
-        document.getElementById('sum-payment').textContent = labels[this.value] || this.value;
-    });
-});
-
-/* ────────────────────────────────────────
-   7. CARD NUMBER FORMAT  (xxxx xxxx xxxx xxxx)
-──────────────────────────────────────── */
-document.getElementById('card-num-input').addEventListener('input', function () {
-    let v = this.value.replace(/\D/g, '').substring(0, 16);
-    this.value = v.replace(/(.{4})/g, '$1 ').trim();
-});
-
-/* ────────────────────────────────────────
-   8. UPI VERIFY (demo)
-──────────────────────────────────────── */
-function verifyUPI() {
-    const id = document.getElementById('upi_id').value.trim();
-    const el = document.getElementById('upi-status');
-    if (!id.includes('@')) {
-        el.style.color = '#c0392b';
-        el.textContent = '✗ Invalid UPI ID format.';
-        return;
-    }
-    el.style.color = 'var(--text-muted)';
-    el.textContent = 'Verifying…';
-    setTimeout(() => {
-        el.style.color = 'var(--green-deep)';
-        el.textContent = '✓ UPI ID verified successfully.';
-    }, 1200);
-}
-
-/* ────────────────────────────────────────
-   9. CONFIRM BOOKING — show success modal
-──────────────────────────────────────── */
-function confirmBooking() {
-    // Basic validation
-    const name  = document.getElementById('full_name').value.trim();
-    const phone = document.getElementById('phone').value.trim();
-    const addr  = document.getElementById('address').value.trim();
-    const date  = document.getElementById('pickup_date').value;
-
-    if (!name || !phone || !addr || !date) {
-        alert('Please fill in all required fields before confirming.');
-        return;
-    }
-
-    // Generate a booking ID
-    const id = 'ECO-' + Math.random().toString(36).substr(2, 6).toUpperCase();
-    document.getElementById('booking-id').textContent = id;
-
-    // Show success modal
-    document.getElementById('success-modal').classList.add('open');
-}
-</script>
-
+<script src="{% static 'js/booking.js' %}"></script>
 {% endblock %}
