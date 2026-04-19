@@ -1,0 +1,233 @@
+{% extends "base.html" %}
+
+{% block extra_styles %}
+<style>
+    .confirm-page {
+        min-height: calc(100vh - 68px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        background:
+            radial-gradient(ellipse at 70% 20%, rgba(76,186,128,0.14) 0%, transparent 55%),
+            var(--green-bg);
+    }
+
+    .confirm-card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 28px;
+        padding: 56px 52px;
+        max-width: 580px;
+        width: 100%;
+        box-shadow: var(--shadow-lg);
+        text-align: center;
+        animation: popIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    @keyframes popIn {
+        from { opacity: 0; transform: scale(0.94) translateY(24px); }
+        to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    .confirm-icon {
+        width: 80px; height: 80px;
+        background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 38px;
+        margin: 0 auto 28px;
+        box-shadow: 0 8px 24px rgba(45,158,95,0.40);
+    }
+
+    .confirm-card h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 32px; color: var(--text-dark);
+        margin-bottom: 10px;
+    }
+
+    .confirm-card .subtitle {
+        font-size: 16px; color: var(--text-muted);
+        line-height: 1.6; margin-bottom: 36px;
+        font-weight: 300;
+    }
+
+    /* Booking ID badge */
+    .booking-id-badge {
+        display: inline-block;
+        background: var(--green-pale);
+        border: 1.5px solid var(--green-light);
+        border-radius: 12px;
+        padding: 12px 28px;
+        font-family: monospace;
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--green-deep);
+        letter-spacing: 3px;
+        margin-bottom: 36px;
+    }
+
+    /* Details table */
+    .detail-table {
+        background: var(--green-bg);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        margin-bottom: 36px;
+        text-align: left;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: flex-start;
+        padding: 14px 20px;
+        gap: 12px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .detail-row:last-child { border-bottom: none; }
+
+    .dr-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+
+    .dr-label {
+        font-size: 12px; font-weight: 600;
+        color: var(--text-muted); margin-bottom: 2px;
+        text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .dr-value {
+        font-size: 15px; font-weight: 600; color: var(--text-dark);
+    }
+
+    /* Action buttons */
+    .confirm-actions {
+        display: flex; gap: 14px; justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-home {
+        display: inline-block;
+        padding: 14px 32px;
+        background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+        color: white; border-radius: 50px;
+        font-size: 15px; font-weight: 700;
+        font-family: 'DM Sans', sans-serif;
+        text-decoration: none;
+        box-shadow: 0 5px 18px rgba(45,158,95,0.40);
+        transition: all 0.2s;
+    }
+
+    .btn-home:hover { transform: translateY(-2px); }
+
+    .btn-new-booking {
+        display: inline-block;
+        padding: 13px 28px;
+        background: var(--white);
+        color: var(--green-deep);
+        border: 2px solid var(--border);
+        border-radius: 50px;
+        font-size: 15px; font-weight: 600;
+        font-family: 'DM Sans', sans-serif;
+        text-decoration: none;
+        transition: all 0.2s;
+    }
+
+    .btn-new-booking:hover {
+        border-color: var(--green-mid);
+        background: var(--green-pale);
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="confirm-page">
+    <div class="confirm-card">
+
+        <div class="confirm-icon">✓</div>
+
+        <h1>Booking Confirmed!</h1>
+        <p class="subtitle">
+            Thank you, <strong>{{ booking.full_name }}</strong>!<br>
+            Your waste pickup has been scheduled. Our team will arrive on time. ♻️
+        </p>
+
+        <!-- Booking ID -->
+        <div>
+            <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px;font-weight:600;">
+                BOOKING REFERENCE
+            </div>
+            <div class="booking-id-badge">
+                ECO-{{ booking.user|upper|slice:":4" }}{{ booking.pickup_date|slice:"8:" }}
+            </div>
+        </div>
+
+        <!-- Details table -->
+        <div class="detail-table">
+
+            <div class="detail-row">
+                <span class="dr-icon">📍</span>
+                <div>
+                    <div class="dr-label">Pickup Address</div>
+                    <div class="dr-value">{{ booking.address }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <span class="dr-icon">🗓️</span>
+                <div>
+                    <div class="dr-label">Date &amp; Time Slot</div>
+                    <div class="dr-value">{{ booking.pickup_date }} · {{ booking.time_slot }}</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <span class="dr-icon">🗑️</span>
+                <div>
+                    <div class="dr-label">Waste Types</div>
+                    <div class="dr-value">
+                        {% for w in booking.waste_types %}
+                            {{ w }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <span class="dr-icon">⚖️</span>
+                <div>
+                    <div class="dr-label">Estimated Weight</div>
+                    <div class="dr-value">{{ booking.weight }} kg</div>
+                </div>
+            </div>
+
+            <div class="detail-row">
+                <span class="dr-icon">💳</span>
+                <div>
+                    <div class="dr-label">Payment Method</div>
+                    <div class="dr-value">{{ booking.payment_method|title }}</div>
+                </div>
+            </div>
+
+            {% if booking.notes %}
+            <div class="detail-row">
+                <span class="dr-icon">📝</span>
+                <div>
+                    <div class="dr-label">Notes</div>
+                    <div class="dr-value">{{ booking.notes }}</div>
+                </div>
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Action buttons -->
+        <div class="confirm-actions">
+            <a href="{% url 'home' %}"    class="btn-home">🏠 Back to Home</a>
+            <a href="{% url 'booking' %}" class="btn-new-booking">+ New Booking</a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

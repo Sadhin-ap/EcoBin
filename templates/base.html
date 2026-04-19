@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoBin — Smart Waste Management</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ── Root Variables ───────────────────────────────── */
+        :root {
+            --green-deep:    #1a6b3c;
+            --green-mid:     #2d9e5f;
+            --green-light:   #4cba80;
+            --green-pale:    #d4f1e2;
+            --green-bg:      #f0faf4;
+            --white:         #ffffff;
+            --text-dark:     #1a2e22;
+            --text-muted:    #5a7a65;
+            --border:        #c4e8d4;
+            --shadow-sm:     0 2px 8px rgba(26, 107, 60, 0.10);
+            --shadow-md:     0 6px 24px rgba(26, 107, 60, 0.14);
+            --shadow-lg:     0 16px 48px rgba(26, 107, 60, 0.18);
+            --radius:        14px;
+            --radius-sm:     8px;
+        }
+
+        /* ── Reset & Base ─────────────────────────────────── */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--green-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* ── Navbar ───────────────────────────────────────── */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .navbar-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 32px;
+            height: 68px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .navbar-logo .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 8px rgba(45, 158, 95, 0.35);
+        }
+
+        .navbar-logo .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--green-deep);
+            letter-spacing: -0.3px;
+        }
+
+        .navbar-links {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            list-style: none;
+        }
+
+        .navbar-links a {
+            display: block;
+            padding: 8px 16px;
+            text-decoration: none;
+            font-size: 14.5px;
+            font-weight: 500;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            transition: color 0.2s, background 0.2s;
+        }
+
+        .navbar-links a:hover {
+            color: var(--green-deep);
+            background: var(--green-pale);
+        }
+
+        .navbar-links a.active {
+            color: var(--green-deep);
+            background: var(--green-pale);
+            font-weight: 600;
+        }
+
+        .navbar-cta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-outline-nav {
+            padding: 8px 18px;
+            border: 1.5px solid var(--green-mid);
+            color: var(--green-mid);
+            background: transparent;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-outline-nav:hover {
+            background: var(--green-pale);
+        }
+
+        .btn-solid-nav {
+            padding: 8px 20px;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-decoration: none;
+            box-shadow: 0 3px 12px rgba(45, 158, 95, 0.35);
+            transition: all 0.2s;
+        }
+
+        .btn-solid-nav:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 16px rgba(45, 158, 95, 0.45);
+        }
+
+        /* ── Page wrapper (pushes below navbar) ──────────── */
+        .page-content { padding-top: 68px; }
+
+        /* ── Flash Messages ───────────────────────────────── */
+        .flash-messages {
+            max-width: 480px;
+            margin: 0 auto 20px;
+        }
+
+        .flash {
+            padding: 12px 18px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            border-left: 4px solid;
+        }
+
+        .flash-error {
+            background: #fff0f0;
+            color: #c0392b;
+            border-color: #e74c3c;
+        }
+
+        .flash-success {
+            background: var(--green-pale);
+            color: var(--green-deep);
+            border-color: var(--green-mid);
+        }
+
+        /* ── Utility Buttons ──────────────────────────────── */
+        .btn-primary {
+            display: inline-block;
+            width: 100%;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-deep));
+            color: var(--white);
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: 'DM Sans', sans-serif;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 4px 16px rgba(45, 158, 95, 0.40);
+            transition: all 0.25s;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(45, 158, 95, 0.50);
+        }
+
+        .btn-primary:active { transform: translateY(0); }
+
+        /* ── Footer ───────────────────────────────────────── */
+        footer {
+            background: var(--green-deep);
+            color: rgba(255,255,255,0.75);
+            text-align: center;
+            padding: 28px 20px;
+            font-size: 14px;
+            margin-top: 80px;
+        }
+
+        footer a { color: var(--green-light); text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+    </style>
+    {% block extra_styles %}{% endblock %}
+</head>
+<body>
+
+    <!-- ═══════════════════════════════════════
+         NAVBAR
+    ════════════════════════════════════════ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+
+            <a href="/" class="navbar-logo">
+                <span class="logo-icon">♻️</span>
+                <span class="logo-text">EcoBin</span>
+            </a>
+
+            <ul class="navbar-links">
+                <li><a href="/#home"     class="active">Home</a></li>
+                <li><a href="/#about">About Us</a></li>
+                <li><a href="/#services">Services</a></li>
+                <li><a href="/booking/">Booking</a></li>
+                <li><a href="/#contact">Contact</a></li>
+            </ul>
+
+            <div class="navbar-cta">
+                <a href="/login/"    class="btn-outline-nav">Login</a>
+                <a href="/register/" class="btn-solid-nav">Get Started</a>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- ═══════════════════════════════════════
+         PAGE CONTENT
+    ════════════════════════════════════════ -->
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ═══════════════════════════════════════
+         FOOTER
+    ════════════════════════════════════════ -->
+    <footer>
+        <p>© 2025 EcoBin · Building a <strong style="color:var(--green-light)">cleaner world</strong> together ·
+           <a href="/#contact">Contact Us</a>
+        </p>
+    </footer>
+
+</body>
+</html>
