@@ -2,7 +2,6 @@
 
 {% block extra_styles %}
 <style>
-    /* ── Hero Section ─────────────────────────────────── */
     .hero {
         min-height: calc(100vh - 68px);
         display: flex;
@@ -16,7 +15,6 @@
         overflow: hidden;
     }
 
-    /* Decorative circles */
     .hero::before {
         content: '';
         position: absolute;
@@ -140,7 +138,6 @@
         transform: translateY(-2px);
     }
 
-    /* Hero Visual Card */
     .hero-visual {
         animation: fadeSlideUp 0.8s ease 0.2s both;
     }
@@ -191,7 +188,6 @@
         display: block;
     }
 
-    /* ── Section Commons ──────────────────────────────── */
     section {
         padding: 100px 32px;
     }
@@ -227,7 +223,6 @@
         font-weight: 300;
     }
 
-    /* ── About Section ────────────────────────────────── */
     #about {
         background: var(--white);
     }
@@ -312,7 +307,6 @@
     }
     .about-card .card-desc { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
 
-    /* ── Services Section ─────────────────────────────── */
     #services { background: var(--green-bg); }
 
     .services-grid {
@@ -369,7 +363,6 @@
 
     .service-card .s-link:hover { gap: 10px; }
 
-    /* ── Book Banner ──────────────────────────────────── */
     .book-banner {
         background: linear-gradient(135deg, var(--green-deep) 0%, #0d4a2a 100%);
         border-radius: 28px;
@@ -424,7 +417,6 @@
         box-shadow: 0 10px 32px rgba(0,0,0,0.30);
     }
 
-    /* ── Contact Section ──────────────────────────────── */
     #contact {
         background: var(--white);
     }
@@ -459,7 +451,6 @@
     .ci-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 2px; }
     .ci-value { font-size: 15px; font-weight: 600; color: var(--text-dark); }
 
-    /* Contact Form */
     .contact-form {
         background: var(--green-bg);
         border: 1px solid var(--border);
@@ -495,7 +486,6 @@
 
     .form-row textarea { resize: vertical; min-height: 120px; }
 
-    /* ── Animations ───────────────────────────────────── */
     @keyframes fadeSlideUp {
         from { opacity: 0; transform: translateY(28px); }
         to   { opacity: 1; transform: translateY(0); }
@@ -506,9 +496,7 @@
 
 {% block content %}
 
-<!-- ═══════════════════════════════════════════
-     HERO
-════════════════════════════════════════════ -->
+
 <section class="hero" id="home">
     <div class="hero-inner">
 
@@ -534,7 +522,6 @@
             </div>
         </div>
 
-        <!-- Right column — visual card -->
         <div class="hero-visual">
             <div class="hero-card">
                 <span class="hero-card-icon">🗑️</span>
@@ -563,9 +550,6 @@
 </section>
 
 
-<!-- ═══════════════════════════════════════════
-     ABOUT
-════════════════════════════════════════════ -->
 <section id="about">
     <div class="section-inner">
         <span class="section-label">Who We Are</span>
@@ -642,9 +626,6 @@
 </section>
 
 
-<!-- ═══════════════════════════════════════════
-     SERVICES
-════════════════════════════════════════════ -->
 <section id="services">
     <div class="section-inner">
         <span class="section-label">What We Do</span>
@@ -719,9 +700,6 @@
 </section>
 
 
-<!-- ═══════════════════════════════════════════
-     BOOKING BANNER
-════════════════════════════════════════════ -->
 <section style="background: var(--green-bg); padding: 80px 32px;">
     <div class="section-inner">
         <div class="book-banner">
@@ -736,9 +714,7 @@
 </section>
 
 
-<!-- ═══════════════════════════════════════════
-     CONTACT
-════════════════════════════════════════════ -->
+
 <section id="contact">
     <div class="section-inner">
         <span class="section-label">Get in Touch</span>
@@ -788,7 +764,6 @@
                 </div>
             </div>
 
-            <!-- Form -->
             <div class="contact-form">
                 <form method="POST" action="/contact/">
                     {% csrf_token %}

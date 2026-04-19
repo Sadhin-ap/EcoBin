@@ -2,7 +2,6 @@
 
 {% block extra_styles %}
 <style>
-    /* ── Auth Page Layout ─────────────────────────────── */
     .auth-page {
         min-height: calc(100vh - 68px);
         display: flex;
@@ -15,7 +14,6 @@
             var(--green-bg);
     }
 
-    /* ── Auth Card ────────────────────────────────────── */
     .auth-card {
         background: var(--white);
         border: 1px solid var(--border);
@@ -32,7 +30,6 @@
         to   { opacity: 1; transform: translateY(0)    scale(1);    }
     }
 
-    /* Logo inside card */
     .auth-logo {
         text-align: center;
         margin-bottom: 36px;
@@ -62,7 +59,6 @@
         font-weight: 300;
     }
 
-    /* ── Form Fields ──────────────────────────────────── */
     .auth-form .field {
         margin-bottom: 20px;
     }
@@ -110,7 +106,6 @@
 
     .auth-form input::placeholder { color: #a0b8a8; }
 
-    /* ── Forgot link ──────────────────────────────────── */
     .auth-row {
         display: flex;
         justify-content: flex-end;
@@ -127,7 +122,6 @@
 
     .auth-row a:hover { text-decoration: underline; }
 
-    /* ── Divider ──────────────────────────────────────── */
     .auth-divider {
         display: flex;
         align-items: center;
@@ -149,7 +143,6 @@
         white-space: nowrap;
     }
 
-    /* ── Switch link ──────────────────────────────────── */
     .auth-switch {
         text-align: center;
         font-size: 14.5px;
@@ -165,7 +158,6 @@
 
     .auth-switch a:hover { text-decoration: underline; }
 
-    /* ── Flash messages ───────────────────────────────── */
     .auth-flash { margin-bottom: 22px; }
 
     .auth-flash p {
@@ -193,7 +185,6 @@
             <p>Sign in to your EcoBin account</p>
         </div>
 
-        <!-- Flash messages -->
         {% if messages %}
         <div class="auth-flash">
             {% for message in messages %}
@@ -202,7 +193,6 @@
         </div>
         {% endif %}
 
-        <!-- Login form -->
         <form method="POST" class="auth-form">
             {% csrf_token %}
 
