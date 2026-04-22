@@ -106,9 +106,6 @@ def booking(request):
     return render(request, 'booking.html')
 
 
-# ─────────────────────────────────────────────
-#  BOOKING CONFIRMATION  (requires login)
-# ─────────────────────────────────────────────
 @login_required
 def booking_confirm(request):
     booking_data = request.session.get('last_booking', None)
