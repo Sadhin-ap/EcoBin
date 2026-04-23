@@ -16,8 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-
+from ecobinapp import views
 urlpatterns = [
     path('',include('ecobinapp.urls')),
     path('admin/', admin.site.urls),
+    path('booking/confirm/<int:booking_id>/', views.booking_confirm, name='booking_confirm'),
+    path('register/', views.register_view, name='register'),
 ]

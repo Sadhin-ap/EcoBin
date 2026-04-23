@@ -1,0 +1,556 @@
+/* =============================================================
+   styles.css — EcoPickup Booking Page
+   Sections:
+     1. CSS Variables & Reset
+     2. Layout
+     3. Cards
+     4. Form Elements
+     5. Map
+     6. Time Slots
+     7. Waste Type Selector
+     8. Payment Tabs & Panels
+     9. Order Summary
+    10. Confirm Button
+    11. Success Modal
+    12. Utilities
+   ============================================================= */
+
+
+/* ── 1. CSS Variables & Reset ─────────────────────────────── */
+
+:root {
+  --green-deep:    #1a6b3c;
+  --green-mid:     #2d9e5f;
+  --green-light:   #e8f5ee;
+  --green-accent:  #34c97a;
+
+  --text-primary:  #1a2e24;
+  --text-muted:    #6b8a76;
+  --border:        #c8ddd1;
+  --surface:       #ffffff;
+  --bg:            #f2f8f4;
+
+  --radius:        12px;
+  --shadow:        0 2px 16px rgba(26, 107, 60, 0.09);
+  --transition:    0.2s ease;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+
+/* ── 2. Layout ────────────────────────────────────────────── */
+
+.booking-wrapper {
+  max-width: 760px;
+  margin: 40px auto;
+  padding: 0 16px 60px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--green-deep);
+}
+
+
+/* ── 3. Cards ─────────────────────────────────────────────── */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+}
+
+.card-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--green-deep);
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--green-light);
+}
+
+.card-hint {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+
+
+/* ── 4. Form Elements ─────────────────────────────────────── */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="date"],
+input[type="password"],
+textarea,
+select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  background: var(--surface);
+  transition: border-color var(--transition);
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--green-mid);
+}
+
+textarea {
+  resize: vertical;
+}
+
+.field-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Input paired with a button (e.g. UPI verify) */
+.input-with-btn {
+  display: flex;
+  gap: 10px;
+}
+
+.input-with-btn input {
+  flex: 1;
+}
+
+.input-with-btn button {
+  padding: 10px 18px;
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  white-space: nowrap;
+}
+
+.input-with-btn button:hover {
+  background: var(--green-deep);
+}
+
+
+/* ── 5. Map ───────────────────────────────────────────────── */
+
+#ecomap {
+  height: 340px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  margin-bottom: 14px;
+}
+
+/* Leaflet popup customisation */
+.leaflet-popup-content-wrapper {
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.popup-title {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--green-deep);
+  margin-bottom: 2px;
+}
+
+.popup-type {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--green-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.popup-distance {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--green-deep);
+  margin-bottom: 8px;
+}
+
+.popup-select-btn {
+  display: block;
+  width: 100%;
+  padding: 8px 0;
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  border-radius: 7px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.popup-select-btn:hover {
+  background: var(--green-deep);
+}
+
+/* Badge shown after a factory is selected */
+.selected-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--green-light);
+  border: 1.5px solid var(--green-mid);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--green-deep);
+}
+
+.selected-badge.hidden {
+  display: none;
+}
+
+/* Legacy class kept for JS compatibility */
+.selected-badge.visible {
+  display: flex;
+}
+
+
+/* ── 6. Time Slots ────────────────────────────────────────── */
+
+.slot-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.slot-btn {
+  padding: 9px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.slot-btn:hover:not(.unavailable) {
+  border-color: var(--green-mid);
+  color: var(--green-deep);
+}
+
+.slot-btn.selected {
+  background: var(--green-mid);
+  border-color: var(--green-mid);
+  color: white;
+  font-weight: 600;
+}
+
+.slot-btn.unavailable {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+
+/* ── 7. Waste Type Selector ───────────────────────────────── */
+
+.waste-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+}
+
+/* Hide the native checkbox */
+.waste-option input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.waste-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition), background var(--transition);
+}
+
+.waste-tile:hover {
+  border-color: var(--green-mid);
+  background: var(--green-light);
+}
+
+/* Tile turns green when its checkbox is checked */
+.waste-option input:checked + .waste-tile {
+  border-color: var(--green-mid);
+  background: var(--green-light);
+}
+
+.w-icon  { font-size: 1.4rem; }
+.w-name  { font-size: 0.8rem; font-weight: 600; color: var(--text-primary); }
+.w-price { font-size: 0.75rem; color: var(--green-mid); }
+
+
+/* ── 8. Payment Tabs & Panels ─────────────────────────────── */
+
+.payment-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* Hide the native radio button */
+.pay-tab input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pay-tab span {
+  display: inline-block;
+  padding: 9px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: border-color var(--transition), background var(--transition), color var(--transition);
+}
+
+.pay-tab span:hover {
+  border-color: var(--green-mid);
+}
+
+.pay-tab input:checked + span {
+  background: var(--green-deep);
+  border-color: var(--green-deep);
+  color: white;
+  font-weight: 600;
+}
+
+/* Each payment panel is hidden by default */
+.pay-panel {
+  display: none;
+  padding-top: 4px;
+}
+
+.pay-panel.active {
+  display: block;
+}
+
+.cod-note {
+  padding: 14px;
+  background: var(--green-light);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+
+/* ── 9. Order Summary ─────────────────────────────────────── */
+
+.summary-list {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  margin-bottom: 20px;
+}
+
+.summary-list dt {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.summary-list dd {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.summary-list dd.discount {
+  color: var(--green-mid);
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 0;
+  border-top: 2px solid var(--green-light);
+  border-bottom: 2px solid var(--green-light);
+  margin-bottom: 20px;
+}
+
+.summary-total span {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.summary-total strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--green-deep);
+}
+
+
+/* ── 10. Confirm Button ───────────────────────────────────── */
+
+.confirm-btn {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+}
+
+.confirm-btn:hover {
+  background: var(--green-deep);
+  transform: translateY(-1px);
+}
+
+.confirm-btn:active {
+  transform: translateY(0);
+}
+
+
+/* ── 11. Success Modal ────────────────────────────────────── */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 16px;
+}
+
+.modal-backdrop.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: white;
+  border-radius: var(--radius);
+  padding: 40px 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-icon {
+  font-size: 3rem;
+  margin-bottom: 12px;
+}
+
+.modal-box h2 {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--green-deep);
+  margin-bottom: 10px;
+}
+
+.modal-box p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.booking-id {
+  font-size: 1.4rem !important;
+  font-weight: 800;
+  color: var(--green-deep) !important;
+  letter-spacing: 0.08em;
+  margin: 8px 0 16px !important;
+}
+
+.modal-note {
+  font-size: 0.82rem !important;
+  color: var(--text-muted);
+  margin-bottom: 24px !important;
+}
+
+.modal-box button {
+  padding: 12px 32px;
+  background: var(--green-mid);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+.modal-box button:hover {
+  background: var(--green-deep);
+}
+
+
+/* ── 12. Utilities ────────────────────────────────────────── */
+
+.hidden  { display: none !important; }
+.visible { display: flex !important; }

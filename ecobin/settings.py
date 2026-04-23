@@ -114,6 +114,9 @@ USE_TZ = True
 
 LOGIN_URL = 'login'
 
+RAZORPAY_KEY_ID = "rzp_test_3726"
+RAZORPAY_KEY_SECRET = "78677867"
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
